@@ -38,10 +38,7 @@ public class DrawingView extends View {
     private Bitmap canvasBitmap;
 
     // choosing brush
-    private float brushSize, lastBrushSize;
-
-    // erasing
-    private boolean erase=false;
+    private float brushSize;
 
 
     // sound playing
@@ -50,7 +47,8 @@ public class DrawingView extends View {
     // playing sound
     boolean isSet = false;
 
-    int count = 0;
+    // log file title
+    static String title = "init";
 
     public DrawingView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -70,7 +68,6 @@ public class DrawingView extends View {
         drawPaint.setStrokeCap(Paint.Cap.ROUND);
         canvasPaint = new Paint(Paint.DITHER_FLAG);
         brushSize = getResources().getInteger(R.integer.medium_size);
-        lastBrushSize = brushSize;
         drawPaint.setStrokeWidth(brushSize);
 
     }
@@ -126,35 +123,10 @@ public class DrawingView extends View {
         drawPaint.setColor(paintColor);
     }
 
-    /*
-    // choosing brush
-    public void setBrushSize(float newSize){
-//update size
-        float pixelAmount = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-                newSize, getResources().getDisplayMetrics());
-        brushSize=pixelAmount;
-        drawPaint.setStrokeWidth(brushSize);
-    }
-
-    public void setLastBrushSize(float lastSize){
-        lastBrushSize=lastSize;
-    }
-    public float getLastBrushSize(){
-        return lastBrushSize;
-    }
-
-    public void setErase(boolean isErase){
-//set erase true or false
-        erase=isErase;
-        if(erase) drawPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        else drawPaint.setXfermode(null);
-    }
-*/
-    public void startNew(){
+    public void startNew(String title){
+        this.title = title;
         drawCanvas.drawColor(0, PorterDuff.Mode.CLEAR);
-        count++;
-        String fileStartLog = "\n\n\n----------------new fileNum: "+count+"----------------\n";
-        writeLog((fileStartLog));
+        writeLog(title);
         invalidate();
     }
 
@@ -170,7 +142,7 @@ public class DrawingView extends View {
 
     public static void writeLog(String str) {
         String str_Path_Full = Environment.getExternalStorageDirectory()
-                .getAbsolutePath() + "/download/logdata.txt";
+                .getAbsolutePath() + "/download/"+title+".txt";
         File file = new File(str_Path_Full);
         if (file.exists() == false) {
             try {

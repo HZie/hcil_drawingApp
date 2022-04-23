@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="20dp"
+        android:text="New Drawing"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <EditText
+        android:id="@+id/pid_condition"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="PID_ConNum  ex)P1_01" />
+
+    <RadioGroup
+        android:id="@+id/rbtn_group"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <RadioButton
+            android:id="@+id/rbtn01_ohm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ω" />
+
+        <RadioButton
+            android:id="@+id/rbtn02_ju"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ю" />
+
+        <RadioButton
+            android:id="@+id/rbtn03_te"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="て" />
+
+        <RadioButton
+            android:id="@+id/rbtn04_psi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ψ" />
+    </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_weight="10"
+        >
+
+        <Button
+            android:id="@+id/btn_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Cancel"
+            android:textSize="10sp" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="8" />
+
+        <Button
+            android:id="@+id/btn_next"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Next"
+            android:textColor="@color/white"
+            android:textSize="10sp" />
+    </LinearLayout>
+
+
+</LinearLayout>
