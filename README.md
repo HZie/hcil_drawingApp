@@ -5,4 +5,4 @@ Android application for testing tactile project
 2. Create log file according to the line in the download folder (external storage is used)
 3. New log file is created whenever user make new canvas
 
-!! To Create Log File Properly, Press + button after Starting App !!
+!! To Create Log File Properly, Set PID after Starting App !!
