@@ -149,7 +149,8 @@ public class DrawingView extends View {
                 file.createNewFile();
             } catch (IOException e) {
             }
-        } else {
+        }
+        if(file.exists()!= false){
             try {
                 BufferedWriter bfw = new BufferedWriter(new FileWriter(str_Path_Full,true));
                 bfw.write(str);

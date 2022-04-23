@@ -54,6 +54,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         saveBtn = (ImageButton)findViewById(R.id.save_btn);
         saveBtn.setOnClickListener(this);
 
+        AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
+        aDialog.setTitle("Set PID");
+        aDialog.setMessage("Set PID First");
+        aDialog.setPositiveButton("OK", new DialogInterface.OnClickListener(){
+            public void onClick(DialogInterface cdialog, int which){
+                Dialog dialog = new Dialog(MainActivity.this);
+                dialog.setContentView(R.layout.newfile_dialog);
+                dialog.show();
+
+                EditText pid = dialog.findViewById(R.id.pid_condition);
+                RadioGroup rg = dialog.findViewById(R.id.rbtn_group);
+
+                Button nextBtn = dialog.findViewById(R.id.btn_next);
+                nextBtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        RadioButton rb = dialog.findViewById(rg.getCheckedRadioButtonId());
+                        title = pid.getText().toString() + "-"+rb.getText().toString();
+                        drawView.startNew(title);
+                        dialog.dismiss();
+                    }
+                });
+
+                Button cancelBtn = dialog.findViewById(R.id.btn_cancel);
+                cancelBtn.setOnClickListener(new View.OnClickListener(){
+                    @Override
+                    public void onClick(View view){
+                        dialog.dismiss();
+                    }
+                });
+            }
+        });
+
+        aDialog.show();
+
 
     }
 
