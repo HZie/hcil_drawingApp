@@ -27,28 +27,16 @@
         android:layout_height="match_parent" >
 
         <RadioButton
-            android:id="@+id/rbtn01_ohm"
+            android:id="@+id/rbtn01_withGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ω" />
+            android:text="With Grid" />
 
         <RadioButton
-            android:id="@+id/rbtn02_ju"
+            android:id="@+id/rbtn02_withoutGrid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Ю" />
-
-        <RadioButton
-            android:id="@+id/rbtn03_te"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="て" />
-
-        <RadioButton
-            android:id="@+id/rbtn04_psi"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Ψ" />
+            android:text="Without Grid" />
     </RadioGroup>
 
     <LinearLayout

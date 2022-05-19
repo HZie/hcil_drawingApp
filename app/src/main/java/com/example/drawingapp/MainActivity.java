@@ -23,7 +23,7 @@ import android.widget.Toast;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     // change paint color
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn;
+    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, noidBtn;
 
     // choosing brush
     private float smallBrush, mediumBrush, largeBrush;
@@ -42,9 +42,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         context = this;
 
         drawView = (DrawingView)findViewById(R.id.drawing);
-        LinearLayout paintLayout = (LinearLayout)findViewById(R.id.paint_colors);
-        currPaint = (ImageButton)paintLayout.getChildAt(0);
-        currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
+
+        // just new canvas without id
+        noidBtn = (ImageButton)findViewById(R.id.noid_btn);
+        noidBtn.setOnClickListener(this);
 
         // creating new canvas
         newBtn = (ImageButton)findViewById(R.id.new_btn);
@@ -71,7 +72,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void onClick(View view){
                         RadioButton rb = dialog.findViewById(rg.getCheckedRadioButtonId());
-                        title = pid.getText().toString() + "-"+rb.getText().toString();
+                        String rb_text = "not selected";
+                        if(rb != null)
+                            rb_text = rb.getText().toString();
+                        title = pid.getText().toString() + "-"+rb_text;
                         drawView.startNew(title);
                         dialog.dismiss();
                     }
@@ -92,20 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void paintClicked(View view){
 
-        if(view!=currPaint){
-//update color
-            ImageButton imgView = (ImageButton)view;
-            String color = view.getTag().toString();
-            drawView.setColor(color);
-
-            imgView.setImageDrawable(getResources().getDrawable(R.drawable.paint_pressed));
-            currPaint.setImageDrawable(getResources().getDrawable(R.drawable.paint));
-            currPaint=(ImageButton)view;
-
-        }
-    }
 
 
     @Override
@@ -189,6 +180,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 unsavedToast.show();
             }
             drawView.destroyDrawingCache();
+        }
+        else if(view.getId()==R.id.noid_btn){
+            // no id button
+            noidBtn.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View view){
+                    drawView.startNew(title);
+                    drawView.writeLog("no id setting and new canvas\n");
+                }
+            });
         }
     }
 }
