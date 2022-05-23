@@ -2,10 +2,13 @@ package com.example.drawingapp;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.RectF;
 import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Build;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.util.AttributeSet;
@@ -23,74 +26,50 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class DrawingView extends View {
-    int max_pointer = 2;
+
+    public static final int MAX_FINGERS = 5;
+    private Path[] mFingerPaths = new Path[MAX_FINGERS];
+    private Paint mFingerPaint, canvasPaint;
+    private ArrayList<Path> mCompletedPaths;
+    private RectF mPathBounds = new RectF();
 
 
-    //drawing path
-    private Path drawPath[] = new Path[max_pointer];
-    // for multi touch
-    int id[] = new int[max_pointer];
-    int x[] = new int[max_pointer];
-    int y[] = new int[max_pointer];
-
-
-    // drawing single path
-   // private Path drawPath;
-
-    //drawing and canvas paint
-    private Paint drawPaint, canvasPaint;
-
-    //initial color
-    private int paintColor = 0xFF660000;
     //canvas
     private Canvas drawCanvas;
     //canvas bitmap
     private Bitmap canvasBitmap;
-
-    // choosing brush
-    private float brushSize;
-
-
     // sound playing
-    SoundPool soundPool;
-    SoundManager soundManager;
-    // playing sound
-    boolean isSet = false;
-
+    MediaPlayer mediaplayer;
     // log file title
     static String title = "init";
 
-    public DrawingView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        setupDrawing();
-
+    public DrawingView(Context context) {
+        super(context);
     }
 
-    private void setupDrawing(){
-        // get drawing area setup for interaction
+    public DrawingView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+    }
 
-        // multi touch
-        for(int i = 0; i < max_pointer; i++){
-            drawPath[i] = new Path();
-        }
+    public DrawingView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+    }
 
-
-       // drawPath = new Path();
-
-        drawPaint = new Paint();
-        drawPaint.setColor(paintColor);
-        drawPaint.setAntiAlias(true);
-        drawPaint.setStrokeWidth(20);
-        drawPaint.setStyle(Paint.Style.STROKE);
-        drawPaint.setStrokeJoin(Paint.Join.ROUND);
-        drawPaint.setStrokeCap(Paint.Cap.ROUND);
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        mCompletedPaths = new ArrayList<Path>();
+        mFingerPaint = new Paint();
+        mFingerPaint.setAntiAlias(true);
+        mFingerPaint.setColor(Color.BLACK);
+        mFingerPaint.setStyle(Paint.Style.STROKE);
+        mFingerPaint.setStrokeWidth(20);
+        mFingerPaint.setStrokeCap(Paint.Cap.ROUND);
         canvasPaint = new Paint(Paint.DITHER_FLAG);
-        brushSize = getResources().getInteger(R.integer.medium_size);
-        drawPaint.setStrokeWidth(brushSize);
-
     }
 
     @Override
@@ -104,103 +83,60 @@ public class DrawingView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-//draw view
-
         canvas.drawBitmap(canvasBitmap, 0, 0, canvasPaint);
 
-
-        // multitouch
-        for(int i = 0; i < max_pointer; i++){
-            canvas.drawPath(drawPath[i], drawPaint);
+        for (Path completedPath : mCompletedPaths) {
+            canvas.drawPath(completedPath, mFingerPaint);
         }
 
-
-//        canvas.drawPath(drawPath, drawPaint);
-
-        setSound();
-
+        for (Path fingerPath : mFingerPaths) {
+            if (fingerPath != null) {
+                canvas.drawPath(fingerPath, mFingerPaint);
+            }
+        }
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-//detect user touch
+        int pointerCount = event.getPointerCount();
+        int cappedPointerCount = pointerCount > MAX_FINGERS ? MAX_FINGERS : pointerCount;
+        int actionIndex = event.getActionIndex();
+        int action = event.getActionMasked();
+        int id = event.getPointerId(actionIndex);
 
-        int pointer_count = event.getPointerCount();
-        // max_pointer 수까지만 처리
-        if(pointer_count > max_pointer) pointer_count = max_pointer;
+        if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) && id < MAX_FINGERS) {
+            playSound(true);
+            writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_DOWN");
+            mFingerPaths[id] = new Path();
+            mFingerPaths[id].moveTo(event.getX(actionIndex), event.getY(actionIndex));
+            writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
 
-        switch(event.getAction() & MotionEvent.ACTION_MASK){
-            case MotionEvent.ACTION_DOWN:
-            case MotionEvent.ACTION_POINTER_DOWN:
-                soundManager.playSound(0);
-                for(int i = 0; i < pointer_count; i++){
-                    writeLog(getCurrentTime()+" - pointer["+i+"]: ACTION_DOWN");
-                    id[i] = event.getPointerId(i);
-                    x[i] = (int)(event.getX(i));
-                    y[i] = (int)(event.getY(i));
-                    writeLog(getCurrentTime() +" - (" +x[i] + ", " + y[i] +")\n");
-                    drawPath[i].moveTo(x[i],y[i]);
-                }
-                break;
-            case MotionEvent.ACTION_MOVE:
-                for(int i =0; i < pointer_count; i++){
-                    id[i] = event.getPointerId(i);
-                    x[i] = (int)(event.getX(i));
-                    y[i] = (int)(event.getY(i));
-                    writeLog(getCurrentTime() +" - (" +x[i] + ", " + y[i] +")\n");
-                    drawPath[i].lineTo(x[i],y[i]);
-                }
-                break;
-            case MotionEvent.ACTION_UP:
-            case MotionEvent.ACTION_POINTER_UP:
-                soundManager.stopSound(0);
-                Log.d("sound", soundManager.toString());
-                for(int i = 0; i < pointer_count; i++){
-                    writeLog(getCurrentTime()+" - pointer["+i+"]: ACTION_UP");
-                    drawCanvas.drawPath(drawPath[i], drawPaint);
-                    writeLog(getCurrentTime() +" - (" +x[i] + ", " + y[i] +")\n\n");
-                    drawPath[i].reset();
-                }
-                break;
-            default:
-                return false;
+        }
+        else if ((action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_UP) && id < MAX_FINGERS) {
+            playSound(false);
+            writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_UP");
+            mFingerPaths[id].setLastPoint(event.getX(actionIndex), event.getY(actionIndex));
+            writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+            mCompletedPaths.add(mFingerPaths[id]);
+            mFingerPaths[id].computeBounds(mPathBounds, true);
+            invalidate((int) mPathBounds.left, (int) mPathBounds.top,
+                    (int) mPathBounds.right, (int) mPathBounds.bottom);
+            mFingerPaths[id] = null;
         }
 
-
-        /*
-        // single touch
-        float touchX = event.getX();
-        float touchY = event.getY();
-        String log = getCurrentTime() +" - (" +touchX + ", " + touchY +")\n";
-        System.out.println(event.toString());
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                drawPath.moveTo(touchX, touchY);
-                soundManager.playSound(0);
-                writeLog("ACTION_DOWN: ");
-                break;
-            case MotionEvent.ACTION_MOVE:
-                Log.d("action", "action_move");
-                drawPath.lineTo(touchX, touchY);
-                break;
-            case MotionEvent.ACTION_UP:
-                Log.d("action", "action_up");
-                writeLog("ACTION_UP: ");
-                drawCanvas.drawPath(drawPath, drawPaint);
-                drawPath.reset();
-                soundManager.stopSound(0);
-                break;
-            default:
-                return false;
+        for(int i = 0; i < cappedPointerCount; i++) {
+            if(mFingerPaths[i] != null) {
+                int index = event.findPointerIndex(i);
+                mFingerPaths[i].lineTo(event.getX(index), event.getY(index));
+                mFingerPaths[i].computeBounds(mPathBounds, true);
+                invalidate((int) mPathBounds.left, (int) mPathBounds.top,
+                        (int) mPathBounds.right, (int) mPathBounds.bottom);
+                writeLog("pointer["+i+"]," + getCurrentTime() +" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+            }
         }
-                writeLog(log);
 
-
-         */
-        invalidate();
         return true;
     }
-
 
     public void startNew(String title){
         this.title = title;
@@ -209,19 +145,25 @@ public class DrawingView extends View {
         TransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         drawCanvas.drawRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight(), TransparentPaint);
         writeLog(title);
+
+        mCompletedPaths.clear();
+
         invalidate();
-        for(int i = 0; i < max_pointer; i++){
-            drawPath[i].reset();
-        }
     }
 
-    public void setSound(){
-        if(!isSet){
-            // sound playing
-            soundPool = new SoundPool.Builder().build();
-            soundManager = new SoundManager(MainActivity.context, soundPool);
-            soundManager.addSound(0,R.raw.writing);
-            isSet = true;
+    public void playSound(boolean play){
+        if(play){
+            if(mediaplayer == null){
+                mediaplayer = MediaPlayer.create(getContext(), R.raw.writing);
+                mediaplayer.setLooping(true);
+                mediaplayer.start();
+            }
+        }
+        else{
+            if(mediaplayer != null){
+                mediaplayer.stop();
+                mediaplayer = null;
+            }
         }
     }
 
