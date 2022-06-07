@@ -1,195 +1,133 @@
 package com.example.drawingapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Context;
-import android.media.SoundPool;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
-import java.util.UUID;
-import android.provider.MediaStore;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
-import android.view.View.OnClickListener;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+import androidx.appcompat.app.AppCompatActivity;
 
-    // change paint color
-    private ImageButton currPaint, drawBtn, eraseBtn, newBtn, saveBtn, noidBtn;
+import com.google.android.material.textfield.TextInputEditText;
 
-    // choosing brush
-    private float smallBrush, mediumBrush, largeBrush;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Calendar;
 
-    public static Context context;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
-    private DrawingView drawView;
-
-    String title = "";
+    Context context;
+    TextInputEditText textInput;
+    RadioGroup rg;
+    Button btn_grid, btn_draw;
+    String pid, shape;
+    static String title;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        // interaction
+    protected void onCreate( Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = this;
+        textInput = (TextInputEditText) findViewById(R.id.input_pid);
+        rg = (RadioGroup) findViewById(R.id.radioGroup);
+        btn_grid = (Button) findViewById(R.id.btn_toGrid);
+        btn_draw = (Button) findViewById(R.id.btn_toDrawing);
 
-        drawView = (DrawingView)findViewById(R.id.drawing);
 
-        // just new canvas without id
-        noidBtn = (ImageButton)findViewById(R.id.noid_btn);
-        noidBtn.setOnClickListener(this);
-
-        // creating new canvas
-        newBtn = (ImageButton)findViewById(R.id.new_btn);
-        newBtn.setOnClickListener(this);
-
-        // saving canvas
-        saveBtn = (ImageButton)findViewById(R.id.save_btn);
-        saveBtn.setOnClickListener(this);
-
-        AlertDialog.Builder aDialog = new AlertDialog.Builder(this);
-        aDialog.setTitle("Set PID");
-        aDialog.setMessage("Set PID First");
-        aDialog.setPositiveButton("OK", new DialogInterface.OnClickListener(){
-            public void onClick(DialogInterface cdialog, int which){
-                Dialog dialog = new Dialog(MainActivity.this);
-                dialog.setContentView(R.layout.newfile_dialog);
-                dialog.show();
-
-                EditText pid = dialog.findViewById(R.id.pid_condition);
-                RadioGroup rg = dialog.findViewById(R.id.rbtn_group);
-
-                Button nextBtn = dialog.findViewById(R.id.btn_next);
-                nextBtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        RadioButton rb = dialog.findViewById(rg.getCheckedRadioButtonId());
-                        String rb_text = "not selected";
-                        if(rb != null)
-                            rb_text = rb.getText().toString();
-                        title = pid.getText().toString() + "-"+rb_text;
-                        drawView.startNew(title);
-                        dialog.dismiss();
-                    }
-                });
-
-                Button cancelBtn = dialog.findViewById(R.id.btn_cancel);
-                cancelBtn.setOnClickListener(new View.OnClickListener(){
-                    @Override
-                    public void onClick(View view){
-                        dialog.dismiss();
-                    }
-                });
+        rg.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int checkedId) {
+                RadioButton checkedBtn = (RadioButton) findViewById(checkedId);
+                shape = checkedBtn.getText().toString();
             }
         });
 
-        aDialog.show();
-
+        btn_draw.setOnClickListener(this);
+        btn_grid.setOnClickListener(this);
 
     }
 
-
-
-
     @Override
-    public void onClick(View view){
-//respond to clicks
-        if(view.getId()==R.id.new_btn){
-            Dialog dialog = new Dialog(MainActivity.this);
-            dialog.setContentView(R.layout.newfile_dialog);
-            dialog.show();
-
-            EditText pid = dialog.findViewById(R.id.pid_condition);
-            RadioGroup rg = dialog.findViewById(R.id.rbtn_group);
-
-            Button nextBtn = dialog.findViewById(R.id.btn_next);
-            nextBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    RadioButton rb = dialog.findViewById(rg.getCheckedRadioButtonId());
-                    title = pid.getText().toString() + "-"+rb.getText().toString();
-                    drawView.startNew(title);
-                    dialog.dismiss();
-                }
-            });
-
-            Button cancelBtn = dialog.findViewById(R.id.btn_cancel);
-            cancelBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    dialog.dismiss();
-                }
-            });
-
-            //new button
-            /*
-            View newfileDialog = getLayoutInflater().inflate(R.layout.newfile_dialog, null);
-            final EditText pidCond = (EditText)newfileDialog.findViewById(R.id.pid_condition);
-            final RadioGroup shapeGroup = (RadioGroup) newfileDialog.findViewById(R.id.rbtn_group);
-
-            AlertDialog.Builder newDialog = new AlertDialog.Builder(this);
-            newDialog.setView(R.layout.newfile_dialog);
-            newDialog.setTitle("New drawing");
-            newDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    System.out.println(pidCond.getText().toString());
-                    title = pidCond.getText().toString() + shapeGroup.getCheckedRadioButtonId();
-
-                    drawView.startNew(title);
-                    dialog.dismiss();
-                }
-            });
-            newDialog.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    dialog.cancel();
-                }
-            });
-            newDialog.show();*/
+    public void onClick(View view) {
+        pid = textInput.getText().toString();
+        if(pid == null || pid.compareTo("") == 0 || shape == null ){
+            Log.d("63 line", "pid: " + pid +", shape: " + shape);
+            Toast.makeText(context, "Missing something" , Toast.LENGTH_SHORT).show();
+            return;
         }
-        else if(view.getId()==R.id.save_btn){
-            //save drawing
-            AlertDialog.Builder saveDialog = new AlertDialog.Builder(this);
-            saveDialog.setTitle("Save drawing");
-            saveDialog.setMessage("Saved");
-            saveDialog.setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                public void onClick(DialogInterface dialog, int which){
-                    //save drawing
-                }
-            });
-            saveDialog.show();
-            drawView.setDrawingCacheEnabled(true);
-            String imgSaved = MediaStore.Images.Media.insertImage(
-                    getContentResolver(), drawView.getDrawingCache(),
-                    title, "drawing");
-            if(imgSaved!=null){
-                Toast savedToast = Toast.makeText(getApplicationContext(),
-                        "Drawing saved to Gallery!", Toast.LENGTH_SHORT);
-                savedToast.show();
+        title = pid+": "+shape;
+        Intent intent = null;
+        switch(view.getId()){
+            case R.id.btn_toDrawing:
+                writeLog(title, getCurrentTime()+ ": Drawing Activity Start");
+                intent = new Intent(context, DrawingActivity.class);
+                break;
+            case R.id.btn_toGrid:
+                writeLog(title, getCurrentTime()+ ": Grid Activity Start");
+                intent = new Intent(context, GridActivity.class);
+                break;
+            default:
+                break;
+        }
+        if(intent != null){
+            startActivity(intent);
+        }
+    }
+
+    public static void writeLog(String title, String msg) {
+        String folder = "drawing_log";
+        String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download/"+folder;
+        File dir = new File(path);
+        if(!dir.exists()){
+            dir.mkdir();
+        }
+        File file = new File(path+"/"+title+".txt");
+        if (file.exists() == false) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
             }
-            else{
-                Toast unsavedToast = Toast.makeText(getApplicationContext(),
-                        "Image could not be saved.", Toast.LENGTH_SHORT);
-                unsavedToast.show();
+        }
+        if(file.exists()!= false){
+            try {
+                BufferedWriter bfw = new BufferedWriter(new FileWriter(path+"/"+title+".txt",true));
+                bfw.write(msg);
+                bfw.write("\n\n");
+                bfw.flush();
+                bfw.close();
+            } catch (FileNotFoundException e) {
+
+            } catch (IOException e) {
+
             }
-            drawView.destroyDrawingCache();
         }
-        else if(view.getId()==R.id.noid_btn){
-            // no id button
-            noidBtn.setOnClickListener(new View.OnClickListener(){
-                @Override
-                public void onClick(View view){
-                    drawView.startNew(title);
-                    drawView.writeLog("no id setting and new canvas\n");
-                }
-            });
+    }
+
+    public static String getCurrentTime(){
+
+        Calendar calendar = Calendar.getInstance();
+        String mtime = String.format("%d:%d:%d:%d",
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                calendar.get(Calendar.SECOND),
+                calendar.get(Calendar.MILLISECOND));
+
+        return mtime;
+    }
+
+    public boolean onKeyDown(int keycode, KeyEvent event){
+        if(keycode == KeyEvent.KEYCODE_BACK){
+            return true;
         }
+        return false;
     }
 }

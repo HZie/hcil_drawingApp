@@ -7,4 +7,5 @@
     <integer name="medium_size">20</integer>
     <dimen name="large_brush">30dp</dimen>
     <integer name="large_size">30</integer>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>
