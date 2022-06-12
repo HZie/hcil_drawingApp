@@ -32,7 +32,7 @@ import java.util.Calendar;
 
 public class GridView extends View {
 
-    public static final int MAX_FINGERS = 2;
+    public static final int MAX_FINGERS = 1;
     private Path[] mFingerPaths = new Path[MAX_FINGERS];
     private Paint mFingerPaint, canvasPaint;
     private ArrayList<Path> mCompletedPaths;
