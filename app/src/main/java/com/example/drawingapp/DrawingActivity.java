@@ -52,7 +52,7 @@ public class DrawingActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 drawView.startNew(title);
-                                drawView.writeLog("no id setting and new canvas\n");
+                                MainActivity.writeLog("no id setting and new canvas\n");
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -78,7 +78,7 @@ public class DrawingActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Intent intent = new Intent(context, MainActivity.class);
-                                drawView.writeLog(drawView.getCurrentTime() + ": Drawing Activity Over");
+                                MainActivity.writeLog(drawView.getCurrentTime() + ": Drawing Activity Over");
                                 startActivity(intent);
                                 finish();
                             }

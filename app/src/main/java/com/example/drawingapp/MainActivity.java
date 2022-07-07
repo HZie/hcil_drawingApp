@@ -68,11 +68,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = null;
         switch(view.getId()){
             case R.id.btn_toDrawing:
-                writeLog(title, getCurrentTime()+ ": Drawing Activity Start");
+                writeLog(getCurrentTime()+ ": Drawing Activity Start");
                 intent = new Intent(context, DrawingActivity.class);
                 break;
             case R.id.btn_toGrid:
-                writeLog(title, getCurrentTime()+ ": Grid Activity Start");
+                writeLog(getCurrentTime()+ ": Grid Activity Start");
                 intent = new Intent(context, GridActivity.class);
                 break;
             default:
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    public static void writeLog(String title, String msg) {
+    public static void writeLog(String msg) {
         String folder = "drawing_log";
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download/"+folder;
         File dir = new File(path);
@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         }
+        Log.d("saved", "saved well");
     }
 
     public static String getCurrentTime(){

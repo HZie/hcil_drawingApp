@@ -115,16 +115,16 @@ public class GridView extends View {
             }
             playSound(true);
             count++;
-            writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_DOWN");
+            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_DOWN");
             mFingerPaths[id] = new Path();
             mFingerPaths[id].moveTo(event.getX(actionIndex), event.getY(actionIndex));
-            writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
         }
         else if ((action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_UP) && id < MAX_FINGERS) {
             count--;
-            writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_UP");
+            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_UP");
             mFingerPaths[id].setLastPoint(event.getX(actionIndex), event.getY(actionIndex));
-            writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
             mCompletedPaths.add(mFingerPaths[id]);
             mFingerPaths[id].computeBounds(mPathBounds, true);
             invalidate((int) mPathBounds.left, (int) mPathBounds.top,
@@ -142,7 +142,7 @@ public class GridView extends View {
                 mFingerPaths[i].computeBounds(mPathBounds, true);
                 invalidate((int) mPathBounds.left, (int) mPathBounds.top,
                         (int) mPathBounds.right, (int) mPathBounds.bottom);
-                writeLog("pointer["+i+"]," + getCurrentTime() +" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+                MainActivity.writeLog("pointer["+i+"]," + getCurrentTime() +" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
             }
         }
 
@@ -154,7 +154,7 @@ public class GridView extends View {
         Paint TransparentPaint = new Paint();
         TransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         gridCanvas.drawRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight(), TransparentPaint);
-        writeLog(title);
+        MainActivity.writeLog(title);
 
         mCompletedPaths.clear();
 
@@ -176,7 +176,7 @@ public class GridView extends View {
             }
         }
     }
-
+/*
     public static void writeLog(String str) {
         String folder = "drawing_log";
         String path = Environment.getExternalStorageDirectory().getAbsolutePath()+"/download/"+folder;
@@ -211,7 +211,7 @@ public class GridView extends View {
             }
         }
     }
-
+*/
     public static String getCurrentTime(){
         String mtime = null;
 
