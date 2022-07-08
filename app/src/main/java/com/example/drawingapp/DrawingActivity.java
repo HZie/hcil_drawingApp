@@ -18,6 +18,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+// log type : date, timestamp, PID, condition, status, event, pointerId, x, y
 public class DrawingActivity extends AppCompatActivity{
 
     // change paint color
@@ -52,7 +53,7 @@ public class DrawingActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 drawView.startNew(title);
-                                MainActivity.writeLog("no id setting and new canvas\n");
+                                MainActivity.writeLog(MainActivity.makeLogString("newDrawingCanvas", "null",-1,-1,-1));
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -78,7 +79,7 @@ public class DrawingActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Intent intent = new Intent(context, MainActivity.class);
-                                MainActivity.writeLog(drawView.getCurrentTime() + ": Drawing Activity Over");
+                                MainActivity.writeLog(MainActivity.makeLogString("DrawingOver", "null",-1,-1,-1));
                                 startActivity(intent);
                                 finish();
                             }

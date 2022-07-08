@@ -115,16 +115,14 @@ public class GridView extends View {
             }
             playSound(true);
             count++;
-            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_DOWN");
+            MainActivity.writeLog(MainActivity.makeLogString("Grid","ACTION_DOWN", id, event.getX(actionIndex), event.getY(actionIndex)));
             mFingerPaths[id] = new Path();
             mFingerPaths[id].moveTo(event.getX(actionIndex), event.getY(actionIndex));
-            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
         }
         else if ((action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_UP) && id < MAX_FINGERS) {
             count--;
-            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_UP");
+            MainActivity.writeLog(MainActivity.makeLogString("Grid","ACTION_UP", id, event.getX(actionIndex), event.getY(actionIndex)));
             mFingerPaths[id].setLastPoint(event.getX(actionIndex), event.getY(actionIndex));
-            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
             mCompletedPaths.add(mFingerPaths[id]);
             mFingerPaths[id].computeBounds(mPathBounds, true);
             invalidate((int) mPathBounds.left, (int) mPathBounds.top,
@@ -142,7 +140,7 @@ public class GridView extends View {
                 mFingerPaths[i].computeBounds(mPathBounds, true);
                 invalidate((int) mPathBounds.left, (int) mPathBounds.top,
                         (int) mPathBounds.right, (int) mPathBounds.bottom);
-                MainActivity.writeLog("pointer["+i+"]," + getCurrentTime() +" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+                MainActivity.writeLog(MainActivity.makeLogString("Grid","ACTION_MOVE", id, event.getX(actionIndex), event.getY(actionIndex)));
             }
         }
 
@@ -154,8 +152,6 @@ public class GridView extends View {
         Paint TransparentPaint = new Paint();
         TransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         gridCanvas.drawRect(0, 0, gridCanvas.getWidth(), gridCanvas.getHeight(), TransparentPaint);
-        MainActivity.writeLog(title);
-
         mCompletedPaths.clear();
 
         invalidate();
@@ -211,7 +207,7 @@ public class GridView extends View {
             }
         }
     }
-*/
+
     public static String getCurrentTime(){
         String mtime = null;
 
@@ -224,6 +220,6 @@ public class GridView extends View {
 
         return mtime;
     }
-
+*/
 }
 

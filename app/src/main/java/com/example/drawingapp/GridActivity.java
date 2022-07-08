@@ -52,7 +52,7 @@ public class GridActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 gridView.startNew(title);
-                                MainActivity.writeLog("no id setting and new canvas\n");
+                                MainActivity.writeLog(MainActivity.makeLogString("newGridCanvas", "null",-1,-1,-1));
                             }
                         })
                         .setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -78,7 +78,7 @@ public class GridActivity extends AppCompatActivity{
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
                                 Intent intent = new Intent(context, MainActivity.class);
-                                MainActivity.writeLog(gridView.getCurrentTime() + ": Grid Activity Over");
+                                MainActivity.writeLog(MainActivity.makeLogString("GridOver", "null",-1,-1,-1));
                                 startActivity(intent);
                                 finish();
                             }

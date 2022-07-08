@@ -109,17 +109,15 @@ public class DrawingView extends View {
         if ((action == MotionEvent.ACTION_DOWN || action == MotionEvent.ACTION_POINTER_DOWN) && id < MAX_FINGERS) {
             playSound(true);
             count++;
-            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_DOWN");
+            MainActivity.writeLog(MainActivity.makeLogString("Drawing","ACTION_DOWN", id, event.getX(actionIndex), event.getY(actionIndex)));
             mFingerPaths[id] = new Path();
             mFingerPaths[id].moveTo(event.getX(actionIndex), event.getY(actionIndex));
-            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
 
         }
         else if ((action == MotionEvent.ACTION_POINTER_UP || action == MotionEvent.ACTION_UP) && id < MAX_FINGERS) {
             count--;
-            MainActivity.writeLog(getCurrentTime()+" - pointer["+id+"]: ACTION_UP");
+            MainActivity.writeLog(MainActivity.makeLogString("Drawing","ACTION_UP", id, event.getX(actionIndex), event.getY(actionIndex)));
             mFingerPaths[id].setLastPoint(event.getX(actionIndex), event.getY(actionIndex));
-            MainActivity.writeLog(" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
             mCompletedPaths.add(mFingerPaths[id]);
             mFingerPaths[id].computeBounds(mPathBounds, true);
             invalidate((int) mPathBounds.left, (int) mPathBounds.top,
@@ -137,7 +135,7 @@ public class DrawingView extends View {
                 mFingerPaths[i].computeBounds(mPathBounds, true);
                 invalidate((int) mPathBounds.left, (int) mPathBounds.top,
                         (int) mPathBounds.right, (int) mPathBounds.bottom);
-                MainActivity.writeLog("pointer["+i+"]," + getCurrentTime() +" - (" +event.getX(actionIndex) + ", " + event.getY(actionIndex) +")\n");
+                MainActivity.writeLog(MainActivity.makeLogString("Drawing","ACTION_MOVE", id, event.getX(actionIndex), event.getY(actionIndex)));
             }
         }
 
@@ -150,10 +148,7 @@ public class DrawingView extends View {
         Paint TransparentPaint = new Paint();
         TransparentPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
         drawCanvas.drawRect(0, 0, drawCanvas.getWidth(), drawCanvas.getHeight(), TransparentPaint);
-        MainActivity.writeLog(title);
-
         mCompletedPaths.clear();
-
         invalidate();
     }
 
@@ -208,7 +203,7 @@ public class DrawingView extends View {
         }
         Log.d("data", "write log success");
     }
-*/
+
     public static String getCurrentTime(){
         String mtime = null;
 
@@ -221,6 +216,6 @@ public class DrawingView extends View {
 
         return mtime;
     }
-
+*/
 }
 
